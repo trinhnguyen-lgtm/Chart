@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kärcher Quality KPI 2026</title>
-    <!-- Thư viện cần thiết - Sử dụng CDN ổn định hơn cho môi trường Embed -->
+    <title>Kärcher Quality KPI 2026 Roadmap</title>
+    <!-- Essential Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"></script>
@@ -14,241 +14,195 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; background-color: #f8f9fa; }
         .karcher-skew { transform: skewX(-12deg); }
+        /* Custom scrollbar for better look in embed */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #000; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div id="root">
         <div class="flex items-center justify-center min-h-screen">
             <div class="text-center">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-                <p class="font-bold text-gray-500 uppercase tracking-widest text-xs">Đang tải Dashboard...</p>
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-black mx-auto mb-4"></div>
+                <p class="font-bold text-gray-400 uppercase tracking-widest text-[10px]">Loading Dashboard...</p>
             </div>
         </div>
     </div>
 
     <script type="text/babel">
-        // Đảm bảo Recharts đã sẵn sàng
         const { useState, useEffect } = React;
         
         const App = () => {
-            const [activeTab, setActiveTab] = useState('overview');
             const [libReady, setLibReady] = useState(false);
 
             useEffect(() => {
-                // Kiểm tra thư viện Recharts đã tồn tại trên window chưa
-                if (window.Recharts) {
-                    setLibReady(true);
-                }
-                
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [activeTab]);
+                if (window.Recharts) setLibReady(true);
+                if (window.lucide) window.lucide.createIcons();
+            }, []);
 
-            if (!libReady && !window.Recharts) {
-                return (
-                    <div className="flex items-center justify-center min-h-screen">
-                        <div className="bg-red-50 p-6 border border-red-200 rounded text-center">
-                            <p className="text-red-600 font-bold">Lỗi tải thư viện biểu đồ. Vui lòng làm mới trang.</p>
-                        </div>
-                    </div>
-                );
-            }
+            if (!libReady && !window.Recharts) return null;
 
-            const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = window.Recharts;
+            const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } = window.Recharts;
 
             const kpiData = {
                 quality: [
-                    { name: 'TCOQ', value: 1, limit: '≤ 1%', unit: '%', icon: 'trending-down' },
-                    { name: 'Break down rate', value: 1.2, limit: '≤ 1.20%', unit: '%', icon: 'alert-circle' },
-                    { name: 'Product audit ppm', value: 8000, limit: '< 8000', unit: 'ppm', icon: 'search' },
-                    { name: 'Free-pass', value: 65, limit: '≥ 65%', unit: '%', icon: 'check-circle-2' },
-                    { name: 'Checking date', value: 0.95, limit: '< 0.95', unit: 'Day', icon: 'clock' },
+                    { name: 'TCOQ', target: '≤ 1%', icon: 'trending-down' },
+                    { name: 'Breakdown Rate', target: '≤ 1.20%', icon: 'alert-circle' },
+                    { name: 'Product Audit', target: '< 8000 ppm', icon: 'search' },
+                    { name: 'Free-Pass Rate', target: '≥ 65%', icon: 'check-circle-2' },
+                    { name: 'Checking Date', target: '< 0.95 Day', icon: 'clock' },
                 ],
                 iqc_imm: [
-                    { name: 'IQC PPM', value: 9000, limit: '≤ 9000', unit: 'Day', icon: 'truck' },
-                    { name: 'IMM PPM', value: 900, limit: '≤ 900', unit: 'ppm', icon: 'settings' },
-                    { name: 'Packing audit rate', value: 2.5, limit: '≥ 2.5%', unit: '%', icon: 'search' },
+                    { name: 'IQC PPM', target: '≤ 9000 Day', icon: 'truck' },
+                    { name: 'IMM PPM', target: '≤ 900 ppm', icon: 'settings' },
+                    { name: 'Packing Audit Rate', target: '≥ 2.5%', icon: 'search' },
                 ],
                 qc_testing: [
-                    { name: 'PPM Packaging', value: 1500, limit: '< 1500', unit: 'ppm', icon: 'search' },
-                    { name: 'Short audit rate', value: 1.3, limit: '> 1.30%', unit: '%', icon: 'shield-check' },
-                    { name: 'Short audit ppm', value: 6000, limit: '≤ 6000', unit: 'ppm', icon: 'alert-circle' },
-                    { name: 'Product audit rate', value: 0.25, limit: '≥ 0.25%', unit: '%', icon: 'search' },
+                    { name: 'Packaging Audit', target: '< 1500 ppm', icon: 'search' },
+                    { name: 'Short Audit Rate', target: '> 1.30%', icon: 'shield-check' },
+                    { name: 'Short Audit PPM', target: '≤ 6000 ppm', icon: 'alert-circle' },
+                    { name: 'Product Audit Rate', target: '≥ 0.25%', icon: 'search' },
                 ],
-                sqe: [
-                    { name: 'SQI', value: 4, limit: '≤ 4', unit: '%', icon: 'shield-check' },
-                    { name: '8D Time', value: 60, limit: '≤ 60', unit: 'Day', icon: 'clock' },
-                    { name: 'Charge back', value: 85, limit: '85', unit: '%', icon: 'trending-down' },
-                ],
-                qms_qp: [
-                    { name: 'Audit Rate', value: 100, limit: '100%', unit: '%', icon: 'clipboard-check' },
-                    { name: 'NG Findings', value: 0, limit: '≤ 0', unit: 'Qty', icon: 'alert-circle' },
-                    { name: 'Process Audits', value: 6, limit: '6', unit: 'times', icon: 'search' },
-                    { name: 'Prod Release', value: 100, limit: '100%', unit: '%', icon: 'check-circle-2' },
+                sqe_qms: [
+                    { name: 'SQI', target: '≤ 4%', icon: 'shield-check' },
+                    { name: '8D Response Time', target: '≤ 60 Days', icon: 'clock' },
+                    { name: 'Charge Back', target: '85%', icon: 'trending-down' },
+                    { name: 'Audit Plan Rate', target: '100%', icon: 'clipboard-check' },
+                    { name: 'NG Findings', target: '0', icon: 'alert-circle' },
+                    { name: 'Production Release', target: '100%', icon: 'check-circle-2' },
                 ]
             };
 
+            const chartData = [
+                { name: 'Prod Audit', value: 8000 },
+                { name: 'Short Audit', value: 6000 },
+                { name: 'Pack Audit', value: 1500 },
+                { name: 'IMM PPM', value: 900 }
+            ];
+
             const Icon = ({ name, className }) => <i data-lucide={name} className={className}></i>;
 
-            const KPICard = ({ title, value, unit, limit, icon }) => (
-                <div className="bg-white border-l-4 border-[#FFED00] p-4 shadow-md rounded-sm">
-                    <div className="flex items-start justify-between mb-2">
-                        <div className="p-2 bg-gray-100 rounded-full">
-                            <Icon name={icon} className="w-5 h-5 text-black" />
-                        </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Target 2026</span>
+            const KPICard = ({ name, target, icon }) => (
+                <div className="bg-white border-b-2 border-gray-100 p-3 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 rounded-sm">
+                        <Icon name={icon} className="w-4 h-4 text-black" />
                     </div>
-                    <h3 className="text-sm font-bold text-gray-800 truncate mb-1">{title}</h3>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-black text-black">{value}</span>
-                        <span className="text-xs font-semibold text-gray-500">{unit}</span>
-                    </div>
-                    <div className="mt-2 text-[11px] font-medium text-gray-600 bg-gray-50 px-2 py-1 rounded-sm border border-gray-100">
-                        Limit: <span className="font-bold">{limit}</span>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase truncate leading-none mb-1">{name}</p>
+                        <p className="text-sm font-black text-black leading-none">{target}</p>
                     </div>
                 </div>
             );
 
-            const SectionHeader = ({ icon, title, subtitle }) => (
-                <div className="flex items-center gap-3 mb-6 bg-black p-4 text-white rounded-sm">
-                    <Icon name={icon} className="w-8 h-8 text-[#FFED00]" />
-                    <div>
-                        <h2 className="text-xl font-black uppercase leading-none tracking-tight">{title}</h2>
-                        <p className="text-[10px] text-gray-400 uppercase mt-1 tracking-widest">{subtitle}</p>
+            const SectionHeader = ({ icon, title }) => (
+                <div className="flex items-center gap-2 mb-3 mt-6 first:mt-0">
+                    <div className="bg-black p-1.5 rounded-sm">
+                        <Icon name={icon} className="w-4 h-4 text-[#FFED00]" />
                     </div>
+                    <h2 className="text-xs font-black uppercase tracking-tighter text-black">{title}</h2>
+                    <div className="flex-1 h-px bg-gray-200 ml-2"></div>
                 </div>
             );
 
             return (
-                <div className="min-h-screen">
-                    <header className="bg-[#FFED00] px-6 py-6 border-b-8 border-black sticky top-0 z-50">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-black text-[#FFED00] px-4 py-2 font-black text-2xl karcher-skew italic">
-                                    KÄRCHER
-                                </div>
-                                <div>
-                                    <h1 className="text-xl font-black uppercase text-black leading-none">Quality KPI Roadmap</h1>
-                                    <p className="text-xs font-bold text-black opacity-70">Strategic Targets 2026</p>
-                                </div>
+                <div className="max-w-7xl mx-auto p-4 md:p-6">
+                    {/* Header - Compact */}
+                    <header className="bg-[#FFED00] p-4 border-b-4 border-black mb-6 flex justify-between items-center shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-black text-[#FFED00] px-3 py-1.5 font-black text-xl karcher-skew italic leading-none">
+                                KÄRCHER
                             </div>
-                            <nav className="flex gap-2 bg-black p-1 rounded-sm">
-                                {['overview', 'details'].map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`px-4 py-1 text-xs font-bold uppercase rounded-sm transition-colors ${
-                                            activeTab === tab ? 'bg-[#FFED00] text-black' : 'text-white hover:bg-gray-800'
-                                        }`}
-                                    >
-                                        {tab === 'overview' ? 'Tổng quan' : 'Chi tiết'}
-                                    </button>
-                                ))}
-                            </nav>
+                            <div>
+                                <h1 className="text-sm font-black uppercase text-black leading-none tracking-tight">Quality KPI Roadmap 2026</h1>
+                                <p className="text-[9px] font-bold text-black opacity-60 uppercase mt-0.5">Strategic Performance Targets</p>
+                            </div>
+                        </div>
+                        <div className="hidden sm:block text-right">
+                            <p className="text-[9px] font-black uppercase text-black">Status: Strategic Plan</p>
+                            <p className="text-[8px] font-bold text-black/50">Updated: March 2024</p>
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto px-4 py-8">
-                        {activeTab === 'overview' ? (
-                            <div className="space-y-10">
-                                <section>
-                                    <SectionHeader icon="shield-check" title="Chất lượng Xuất sắc" subtitle="Chỉ số hiệu suất & Breakdown" />
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                        {kpiData.quality.map((kpi, idx) => <KPICard key={idx} {...kpi} />)}
-                                    </div>
-                                </section>
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <section>
-                                        <SectionHeader icon="settings" title="IQC & Sản xuất" subtitle="Chất lượng đầu vào & Quy trình" />
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {kpiData.iqc_imm.map((kpi, idx) => <KPICard key={idx} {...kpi} />)}
-                                        </div>
-                                    </section>
-                                    <section>
-                                        <SectionHeader icon="search" title="QC & Thử nghiệm" subtitle="Kiểm định sản phẩm cuối" />
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            {kpiData.qc_testing.map((kpi, idx) => <KPICard key={idx} {...kpi} />)}
-                                        </div>
-                                    </section>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* KPI Columns */}
+                        <div className="lg:col-span-2 space-y-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                                <div className="space-y-2">
+                                    <SectionHeader icon="shield-check" title="Quality Excellence" />
+                                    {kpiData.quality.map((kpi, i) => <KPICard key={i} {...kpi} />)}
+                                    
+                                    <SectionHeader icon="settings" title="IQC & Manufacturing" />
+                                    {kpiData.iqc_imm.map((kpi, i) => <KPICard key={i} {...kpi} />)}
                                 </div>
-                                <section>
-                                    <SectionHeader icon="truck" title="Quản lý nhà cung ứng (SQE)" subtitle="Đánh giá & bồi hoàn" />
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                        {kpiData.sqe.map((kpi, idx) => <KPICard key={idx} {...kpi} />)}
-                                    </div>
-                                </section>
-                            </div>
-                        ) : (
-                            <div className="bg-white p-6 rounded-sm shadow-xl border-t-8 border-black">
-                                <h2 className="text-xl font-black mb-6 border-b-4 border-[#FFED00] pb-1 inline-block uppercase">Phân tích mục tiêu 2026</h2>
-                                <div className="grid md:grid-cols-2 gap-10">
-                                    <div className="h-[400px] w-full">
-                                        <p className="text-xs font-bold uppercase text-gray-500 mb-4">Biểu đồ PPM mục tiêu</p>
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={[
-                                                { name: 'Product Audit', value: 8000 },
-                                                { name: 'Short Audit', value: 6000 },
-                                                { name: 'Package Audit', value: 1500 },
-                                                { name: 'IMM PPM', value: 900 }
-                                            ]}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="name" fontSize={10} fontWeight="bold" />
-                                                <YAxis fontSize={10} />
-                                                <Tooltip 
-                                                    cursor={{fill: '#f3f4f6'}} 
-                                                    contentStyle={{ borderRadius: '0', border: '2px solid black', backgroundColor: 'white' }} 
-                                                />
-                                                <Bar dataKey="value" fill="#000" />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                    <div className="space-y-6">
-                                        <p className="text-xs font-bold uppercase text-gray-500 mb-2">Tỷ lệ hoàn thành mục tiêu (%)</p>
-                                        {[
-                                            { l: 'Kế hoạch Audit (Audit Plan)', v: 100 },
-                                            { l: 'Phát hành sản xuất (Prod Release)', v: 100 },
-                                            { l: 'Tỷ lệ bồi hoàn (Charge Back)', v: 85 },
-                                            { l: 'Tỷ lệ Free Pass', v: 65 }
-                                        ].map((item, i) => (
-                                            <div key={i}>
-                                                <div className="flex justify-between text-[10px] font-black uppercase mb-1">
-                                                    <span>{item.l}</span>
-                                                    <span>{item.v}%</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 h-3">
-                                                    <div className="bg-black h-full border-r-4 border-[#FFED00]" style={{ width: `${item.v}%` }}></div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <div className="mt-8 p-4 bg-black text-white rounded-sm">
-                                            <h4 className="text-[10px] font-bold uppercase text-[#FFED00] mb-2 tracking-widest">Thời gian xử lý mục tiêu</h4>
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <p className="text-[9px] text-gray-400 uppercase">Đóng hồ sơ 8D</p>
-                                                    <p className="text-lg font-black">60 NGÀY</p>
-                                                </div>
-                                                <div className="h-8 w-px bg-gray-700"></div>
-                                                <div>
-                                                    <p className="text-[9px] text-gray-400 uppercase">Kiểm tra (Checking)</p>
-                                                    <p className="text-lg font-black">0.95 NGÀY</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </main>
+                                <div className="space-y-2">
+                                    <SectionHeader icon="search" title="QC & Testing" />
+                                    {kpiData.qc_testing.map((kpi, i) => <KPICard key={i} {...kpi} />)}
 
-                    <footer className="bg-black text-white py-8 px-6 mt-12">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="text-[#FFED00] font-black text-xl karcher-skew italic">KÄRCHER</div>
-                            <div className="text-[9px] font-bold uppercase tracking-widest text-gray-500 text-center md:text-right">
-                                © 2026 Quality Department Roadmap | KVT Quality KPI Infographic
+                                    <SectionHeader icon="truck" title="SQE & Management" />
+                                    {kpiData.sqe_qms.map((kpi, i) => <KPICard key={i} {...kpi} />)}
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Visual Summary Column */}
+                        <div className="space-y-6">
+                            <div className="bg-white p-5 shadow-sm border border-gray-100 rounded-sm">
+                                <h3 className="text-[10px] font-black uppercase text-gray-400 mb-4 tracking-widest border-b border-gray-100 pb-2">PPM Target Benchmarks</h3>
+                                <div className="h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={chartData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                            <CartesianGrid strokeDasharray="2 2" horizontal={true} vertical={false} stroke="#f0f0f0" />
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="name" type="category" fontSize={9} fontWeight="bold" width={80} />
+                                            <Tooltip 
+                                                cursor={{fill: 'transparent'}}
+                                                contentStyle={{ fontSize: '10px', fontWeight: 'bold', borderRadius: '0', border: '1px solid black' }}
+                                            />
+                                            <Bar dataKey="value" radius={[0, 2, 2, 0]} barSize={20}>
+                                                {chartData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={index === 0 ? "#000" : index === 1 ? "#333" : "#666"} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            <div className="bg-black text-white p-5 rounded-sm shadow-md">
+                                <h3 className="text-[10px] font-black uppercase text-[#FFED00] mb-4 tracking-widest leading-none">Process Compliance</h3>
+                                <div className="space-y-4">
+                                    {[
+                                        { l: 'Audit Plan', v: 100 },
+                                        { l: 'Prod Release', v: 100 },
+                                        { l: 'Charge Back', v: 85 },
+                                        { l: 'Free Pass', v: 65 }
+                                    ].map((item, i) => (
+                                        <div key={i}>
+                                            <div className="flex justify-between text-[9px] font-black uppercase mb-1 tracking-tighter">
+                                                <span>{item.l}</span>
+                                                <span className="text-[#FFED00]">{item.v}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                                <div className="bg-[#FFED00] h-full" style={{ width: `${item.v}%` }}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer className="mt-12 pt-4 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="flex items-center gap-4 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                            <span>Data: SAC / SAP PP1 / AQ System</span>
+                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                            <span>Monitoring: Monthly / Weekly</span>
+                        </div>
+                        <div className="text-[8px] font-bold text-gray-400 uppercase">
+                            © 2026 Quality Department | Confidential
                         </div>
                     </footer>
                 </div>
