@@ -44,16 +44,18 @@
                     { name: 'TCOQ', target: '≤ 1%', icon: 'trending-down' },
                     { name: 'Breakdown Rate', target: '≤ 1.20%', icon: 'alert-circle' },
                     { name: 'Product Audit', target: '< 8000 ppm', icon: 'search' },
-                    { name: 'Free-Pass Rate', target: '≥ 65%', icon: 'check-circle-2' },
-                    { name: 'Checking Date', target: '< 0.95 Day', icon: 'clock' },
+
                 ],
                 iqc_imm: [
                     { name: 'IQC PPM', target: '≤ 9000 Day', icon: 'truck' },
                     { name: 'IMM PPM', target: '≤ 900 ppm', icon: 'settings' },
-                    { name: 'Packing Audit Rate', target: '≥ 2.5%', icon: 'search' },
+                   
+                  { name: 'Free-Pass Rate', target: '≥ 65%', icon: 'check-circle-2' },
+                    { name: 'Checking Date', target: '< 0.95 Day', icon: 'clock' },
                 ],
                 qc_testing: [
-                    { name: 'Packaging Audit', target: '< 1500 ppm', icon: 'search' },
+                     { name: 'Packing Audit Rate', target: '≥ 2.5%', icon: 'search' },
+                    { name: 'Packaging Audit PPM', target: '< 1500 ppm', icon: 'search' },
                     { name: 'Short Audit Rate', target: '> 1.30%', icon: 'shield-check' },
                     { name: 'Short Audit PPM', target: '≤ 6000 ppm', icon: 'alert-circle' },
                     { name: 'Product Audit Rate', target: '≥ 0.25%', icon: 'search' },
@@ -125,14 +127,14 @@
                                     <SectionHeader icon="shield-check" title="Quality Excellence" />
                                     {kpiData.quality.map((kpi, i) => <KPICard key={i} {...kpi} />)}
                                     
-                                    <SectionHeader icon="settings" title="IQC & Manufacturing" />
+                                    <SectionHeader icon="settings" title="IQC " />
                                     {kpiData.iqc_imm.map((kpi, i) => <KPICard key={i} {...kpi} />)}
                                 </div>
                                 <div className="space-y-2">
                                     <SectionHeader icon="search" title="QC & Testing" />
                                     {kpiData.qc_testing.map((kpi, i) => <KPICard key={i} {...kpi} />)}
 
-                                    <SectionHeader icon="truck" title="SQE & Management" />
+                                    <SectionHeader icon="truck" title="SQE & QMS" />
                                     {kpiData.sqe_qms.map((kpi, i) => <KPICard key={i} {...kpi} />)}
                                 </div>
                             </div>
